@@ -11,7 +11,7 @@ require authentication. Maven/Gradle host APIs are not bundled.
 ## Status and prerequisites
 
 This is an experimental release, not a production-ready authentication product.
-The integration fixture tests Maven 3.9.16, Gradle 9.3.1 and Java 25 on Linux;
+The integration fixture tests Maven 3.9.16, Gradle 9.9.1 and Java 25 on Linux;
 the originating local-IDP POC was also qualified on macOS. Sources target Java 17.
 Requires POSIX file permissions. Windows, Maven 4, IDE import, private build/settings
 plugins, included builds and crash recovery after a lost refresh response are not
