@@ -1,0 +1,63 @@
+plugins { id 'base' }
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    group = 'io.fluxzero.buildtools'
+    version = rootProject.version
+    repositories { mavenCentral() }
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        withSourcesJar()
+        withJavadocJar()
+    }
+    tasks.withType(JavaCompile).configureEach { options.release = 17 }
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+    publishing {
+        repositories {
+            maven { name = 'fixture'; url = rootProject.layout.buildDirectory.dir('repository') }
+            maven {
+                name = 'packages'
+                url = uri('https://packages.fluxzero.io/publish/maven')
+                credentials {
+                    username = 'github-actions'
+                    password = providers.environmentVariable('MAVEN_DEPLOY_TOKEN').orNull
+                }
+            }
+        }
+    }
+    afterEvaluate {
+        publishing.publications.withType(MavenPublication).configureEach {
+            pom {
+                name = project.name
+                description = 'Experimental browser authentication for private Fluxzero Packages downloads'
+                url = 'https://github.com/fluxzero-io/fluxzero-build-tools'
+                licenses { license { name = 'Apache License, Version 2.0'; url = 'https://www.apache.org/licenses/LICENSE-2.0.txt' } }
+                scm { url = 'https://github.com/fluxzero-io/fluxzero-build-tools'; connection = 'scm:git:https://github.com/fluxzero-io/fluxzero-build-tools.git' }
+            }
+        }
+    }
+}
+configure([project(':maven-extension'), project(':gradle-plugin')]) {
+    configurations { embedded }
+    dependencies { implementation project(':common'); embedded project(':common') }
+    // Standalone bootstrap: bundle common and Gson, never Maven or Gradle host APIs.
+    tasks.named('jar', Jar) {
+        dependsOn configurations.embedded
+        from { configurations.embedded.collect { it.isDirectory() ? it : zipTree(it) } }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA', 'module-info.class', 'META-INF/versions/**/module-info.class'
+    }
+    afterEvaluate {
+        publishing.publications.withType(MavenPublication).configureEach {
+            if (name != 'packagesPluginMarkerMaven') {
+                pom.withXml { asNode().remove(asNode().dependencies) }
+                // Bundled jars have no external runtime dependencies.
+                tasks.withType(GenerateModuleMetadata).configureEach { enabled = false }
+            }
+        }
+    }
+}

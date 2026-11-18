@@ -1,0 +1,1 @@
+<component-set><components><component><role>org.apache.maven.AbstractMavenLifecycleParticipant</role><role-hint>packages-browser-auth</role-hint><implementation>io.fluxzero.buildtools.MavenAuth</implementation></component></components></component-set>

@@ -1,0 +1,11 @@
+plugins { id 'java-gradle-plugin' }
+gradlePlugin {
+    plugins {
+        packages {
+            id = 'io.fluxzero.packages'
+            implementationClass = 'io.fluxzero.buildtools.GradleAuth'
+            displayName = 'Fluxzero Packages authentication'
+            description = 'Experimental browser authentication for private Packages repositories'
+        }
+    }
+}

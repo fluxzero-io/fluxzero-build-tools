@@ -1,0 +1,2 @@
+rootProject.name = 'fluxzero-build-tools'
+include 'common', 'maven-extension', 'gradle-plugin'
