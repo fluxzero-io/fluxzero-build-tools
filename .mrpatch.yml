@@ -1,9 +1,6 @@
 version: 1
 defaults:
   commit-message: {prefix: chore(deps)}
-  schedule:
-    cron: 0 * * * *
-    spread: 55m
   ecosystems:
   - gradle
   - github-actions
